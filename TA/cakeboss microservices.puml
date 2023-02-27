@@ -1,0 +1,40 @@
+.Cake boss bakery service overview
+[plantuml]
+----
+@startuml
+allow_mixing
+'https://plantuml.com/sequence-diagram
+
+object "Cake Boss" as cb
+object "Product Team" as pt
+object "Stock Team"  as st
+object "Orders Team" as ot
+object "Customer Team" as ct
+object "Kitchen Team" as kt
+object "Payment Team" as pyt
+object "Delivery Team" as dt
+
+component [Product Service] as prs
+component [Stock Service] as sts
+component [Order Service] as os
+component [Customer Service] as cs
+component [Kitchen Service] as ks
+component [Payment Service] as pys
+component [Delivery Service] as ds
+
+cb --|> pt
+cb --|> ot
+cb --|> kt
+cb --|> pyt
+cb --|> dt
+cb --|> ct
+cb --|> st
+pt --|> prs
+st ---|> sts
+ot --|> os
+ct ---|> cs
+kt --|> ks
+pyt ---|> pys
+dt ----|> ds
+@enduml
+----

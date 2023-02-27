@@ -1,0 +1,71 @@
+.Customer ordering sequence diagram
+[plantuml]
+----
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor Customer as cst
+boundary "Cake Boss App" as cbapp
+participant "svc-product" as ps
+boundary "Rabbit MQ" as rabbit1
+participant "svc-stock" as stocks
+participant "svc-order" as orders
+boundary "Rabbit MQ" as rabbit2
+participant "svc-kitchen" as kits
+participant "svc-payment" as pays
+participant "svc-delivery" as dels
+participant "svc-customer" as custs
+boundary "Payment Gateway" as pgw
+
+autonumber
+activate ps
+    ps --> cbapp : GET: /svc-product/list
+    cst --> cbapp : Customer selects a product
+    cbapp --> ps : POST: /svc-product/{productId}/{customerId}/make
+    activate stocks
+    ps --> rabbit1 : Place request
+    rabbit1 --> stocks : Check ingredients available
+    stocks --> rabbit1 : Ingredients available response
+    rabbit1 --> ps : Ingredients available response
+    ps --> cbapp : Product available response
+    alt Ingredients available = Yes
+        activate orders
+            cst --> cbapp : Customer places an order
+            cbapp --> orders : POST: /svc-order/{productId}/{userId}/place
+            activate pays
+                            orders --> rabbit2 : Place order
+                            rabbit2 --> pays : /svc-payment/{userId}/{orderId}/init
+                            pays --> cbapp : Payment redirect window
+                            cst --> cbapp : Customer enters payment details
+                            cbapp --> pays : POST: /svc-payment/{userId}/{orderId}/pay
+                            pays --> pgw : POST: /svc-payment/{paymentRef}/{orderId}/pay
+                            pgw --> pays : Payment response
+                            pays --> rabbit2 : Payment Response
+                            rabbit2 --> orders : Payment Response
+                            orders --> cbapp : Payment Response
+                            alt Payment successful
+                                activate kits
+                                    orders --> rabbit2 : Make customer order
+                                    rabbit2 --> kits : /svc-kitchen/{userId}/{orderId}/place
+                                    kits --> cbapp : Order progress response
+                                    activate dels
+                                        kits --> dels : POST: /svc-delivery/{userId}/{orderId}/delivery
+                                        dels --> cbapp : Delivery response
+                                        dels --> custs : POST: /svc-customer/rating
+                                        custs --> cbapp : Rate customer experience
+                                    deactivate dels
+                                deactivate kits
+                            end
+            deactivate pays
+        deactivate orders
+    deactivate stocks
+    cst --> cbapp : Customer enters rating info
+    cbapp --> custs : POST: /svc-customer/{userId}/{orderId}/{storeId}/rating
+    custs --> cbapp : Ratings response
+    end
+deactivate ps
+
+@enduml
+----

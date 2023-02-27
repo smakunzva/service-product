@@ -1,0 +1,28 @@
+= Cake boss bakery
+:sectnums:
+:toc: left
+:toclevels: 4
+:toc-title: Table of Contents
+:icons: font
+:url-quickref: https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/
+:table-caption!:
+
+== Description
+Cake boss is a bakery heaven for all pastry products which leave you salivating for more. There has been a huge influx of orders resulting in long queues at the bakery and as a result an online ordering application is of paramount importance.
+
+== Business
+Create an online ordering system for customers that is able to handle high volumes of orders. The system should offer a seamless experience for the customer and should always be available.
+
+== Architecture
+
+=== Overview
+Cake boss bakery is made up of different departments that work together to produce pastry products and these departments do translate into small micro-services which perform single functionality.
+
+include::cakeboss microservices.puml[]
+
+The sequence diagram below shows the journey of a customer placing an order till the order has been delivered.
+
+include::cakeboss-sequence.puml[]
+
+
+
